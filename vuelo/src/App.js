@@ -26,7 +26,7 @@ function Destino({ destination }) {
       <ul>
         {destination.flights.map((flights) => (
           <li key={flights.id}>
-            <strong>Vuelo:</strong> {flights.id} - <strong>Fecha:</strong> {flights.date}
+            <strong>Vuelo:</strong> {flights.number} - <strong>Fecha:</strong> {flights.date}
           </li>
         ))}
       </ul>
