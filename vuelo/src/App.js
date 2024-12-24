@@ -1,68 +1,53 @@
-// App.js
-import React, { useState } from 'react';
-import vuelosData from './vuelos.json'; // Ajusta la ruta según la ubicación del archivo
+import React, { useState, useEffect } from 'react';
+import vuelosData from './vuelos.json';
 
-function onSeleccionarVuelo(vuelo) {
-  console.log('Vuelo seleccionado:', vuelo);
-}
+const App = () => {
+  const [vuelos, setVuelos] = useState([]);
+  const [vueloSeleccionado, setVueloSeleccionado] = useState(null);
 
-function App() {
-  const [flights] = useState(vuelosData); // Inicializa el estado con los datos del JSON
-  const [vueloSeleccionado, setVueloSeleccionado] = useState(null); // Estado para el vuelo seleccionado
-  const [vuelos] = useState(vuelosData || []); // Carga los datos iniciales
+  useEffect(() => {
+    if (Array.isArray(vuelosData)) {
+      setVuelos(vuelosData);
+    }
+  }, []);
+
+  const seleccionarVuelo = (vuelo, destino) => {
+    setVueloSeleccionado({ ...vuelo, destino });
+  };
+
   return (
-    <div className="App">
-      <header>
-        <h1>Listado de Vuelos</h1>
-      </header>
-      <main>
-        {flights.map((destination) => (
-          <Destino key={destination.destination} destination={destination} 
-          onSeleccionarVuelo={(vuelo) => setVueloSeleccionado(vuelo)}
-          />
-        ))}
-         {/* Panel de detalles del vuelo seleccionado */}
-         {vueloSeleccionado && (
-          <PanelDetalleVuelo vuelo={vueloSeleccionado} />
-        )}
-      </main>
+    <div>
+      <h1>Listado de Vuelos</h1>
+      {vuelos.length > 0 ? (
+        vuelos.map((destino, index) => (
+          <div key={index}>
+            <h2>{destino.destination}</h2>
+            <ul>
+              {destino.flights.map((vuelo, index) => (
+                <li key={index}>
+                  {vuelo.number} - {vuelo.date}
+                  <button onClick={() => seleccionarVuelo(vuelo, destino.destination)}>Seleccionar</button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      ) : (
+        <p>Cargando vuelos...</p>
+      )}
+      {vueloSeleccionado && (
+        <div>
+          <h3>Detalles del Vuelo</h3>
+          <p>Destino: {vueloSeleccionado.destino}</p>
+          <p>Fecha: {vueloSeleccionado.date}</p>
+          <p>Hora: {vueloSeleccionado.time}</p>
+          <p>Plazas: {vueloSeleccionado.seats}</p>
+          <p>Plazas disponibles: {vueloSeleccionado.available_seats}</p>
+          <p>Plazas ocupadas: {vueloSeleccionado.occupied_seats}</p>
+        </div>
+      )}
     </div>
   );
-}
+};
 
-function Destino({ destination }) {
-  return (
-    <div className="destino">
-      <h2>Destino: {destination.destination}</h2>
-      <ul>
-        {destination.flights.map((flights) => (
-          <li key={flights.id}>
-            <strong>Vuelo:</strong> {flights.number} - <strong>Fecha:</strong> {flights.date}
-            <button
-              onClick={() =>
-                onSeleccionarVuelo({ ...flights, destino: destination.destination })
-              }
-            >
-              Seleccionar
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function PanelDetalleVuelo({ flights }) {
-  return (
-    <div className="panel-detalle">
-      <h3>Detalle del Vuelo</h3>
-      <p><strong>Destino:</strong> {Destino.destination}</p>
-      <p><strong>Fecha:</strong> {flights.date}</p>
-      <p><strong>Hora:</strong> {flights.time}</p>
-      <p><strong>Plazas Totales:</strong> {flights.plazasDisponibles + (flights.plazasOcupadas || 0)}</p>
-      <p><strong>Plazas Disponibles:</strong> {flights.plazasDisponibles}</p>
-      <p><strong>Plazas Ocupadas:</strong> {flights.plazasOcupadas || 0}</p>
-    </div>
-  );
-}
 export default App;
